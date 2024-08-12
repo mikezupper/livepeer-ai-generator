@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Livepeer Cloud Ai Generator</title>
+    <link rel="stylesheet" href="/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/fontawesome.min.css" />
+    <script type="module" src="main.js"></script>
+    <script src="/js/fontawesome.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <section class="panel is-primary">
+            <h1 class="panel-heading has-text-centered ">
+                <p class="p-1">AI GENERATOR</p>
+                <p class="title is-6 p-1">A Livepeer Image and Video Generation Testing Tool</p>
+            </h1>
+            <p class="panel-tabs">
+                <nav-links id="navLinks"></nav-links>
+            </p>
+        </section>
+        <section class="panel">
+            <ai-text-to-image></ai-text-to-image>
+            <ai-image-to-image></ai-image-to-image>
+            <ai-image-to-video></ai-image-to-video>
+            <ai-audio-to-text></ai-audio-to-text>
+            <ai-upscale></ai-upscale>
+            <ai-settings id="settings"></ai-settings>
+            <ai-network-capabilities></ai-network-capabilities>
+        </section>
+        <section>
+            <div class="panel">
+                <footer-links></footer-links>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>
