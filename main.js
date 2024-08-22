@@ -17,7 +17,7 @@ console.log("[main] start")
 // register all custom elements
 customElements.define("generated-image-card", GeneratedImageCard);
 customElements.define("generate-image-form", GenerateImgeForm);
-customElements.define("audio-text",AudioTextCard);
+customElements.define("audio-text", AudioTextCard);
 customElements.define("footer-links", FooterLinks);
 customElements.define("nav-links", NavLinks);
 

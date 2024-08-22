@@ -1,4 +1,4 @@
-import { getGatewayUrl } from "../utils";
+import { getBearerToken, getGatewayUrl } from "../utils";
 
 const generateCardTemplate = document.createElement("template");
 generateCardTemplate.innerHTML = `
@@ -112,7 +112,7 @@ export default class GeneratedImageCard extends HTMLElement {
             mode: "cors",
             cache: "no-cache",
               headers: {
-              Authorization: "Bearer None"
+              Authorization: `Bearer ${getBearerToken()}`
             },
             body: formData,
           });

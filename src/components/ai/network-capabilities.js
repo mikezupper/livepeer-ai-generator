@@ -1,7 +1,8 @@
-import {getGatewayUrl} from "../../utils";
-import {fromPromise} from "rxjs/internal/observable/innerFrom";
-import {catchError, fromEvent, map, switchMap} from "rxjs";
+import { getGatewayUrl } from "../../utils";
+import { fromPromise } from "rxjs/internal/observable/innerFrom";
+import { catchError, fromEvent, map, switchMap } from "rxjs";
 import Handlebars from "handlebars";
+import { db } from "../../db";
 
 const networkCapabilitiesTemplate = document.createElement("template")
 networkCapabilitiesTemplate.innerHTML = `
@@ -17,17 +18,25 @@ export default class NetworkCapabilities extends HTMLElement {
     constructor() {
         super();
         this.viewTemplate = Handlebars.compile(`
-            <p class="title">Livepeer AI Pipelines Loaded </p>
+            <p class="title">Livepeer AI Pipelines Loaded</p>
             <span class="subtitle">Gateway: {{gateway}}</span><br/>
-            <br/>
-            {{#each this}}
-                <p class="title">{{pipeline_name}}</p>
-                {{#each values}}
-                <span class="subtitle">{{@key}}: Cold - {{Cold}}, Warm - {{Warm}}</span><br/>
-                {{/each}}
+            {{#each pipelines}}
                 <br/>
+                <p class="title">{{name}}</p>
+                {{#each models}}
+                    <span class="subtitle">{{name}} - Cold: {{Cold}}, Warm: {{Warm}}</span><br/>
+                    <details>
+                <summary>Orchestrators</summary>
+                <ul>
+                    {{#each orchestrators}}
+                        <li>{{ethAddress}} - Warm: {{warm}}</li>
+                    {{/each}}
+                </ul>
+            </details>
+                    <br/>
+                {{/each}}
             {{/each}}
-            `);
+        `);
     }
 
     connectedCallback() {
@@ -35,35 +44,21 @@ export default class NetworkCapabilities extends HTMLElement {
         this.template = networkCapabilitiesTemplate.content.cloneNode(true);
         this.appendChild(this.template);
         this.gateway = getGatewayUrl();
-        const fetchNewCaps = () => {
-            let gw = getGatewayUrl();
-            let url = `${gw}/getNetworkCapabilities`;
-            return fromPromise(fetch(url, {
-                method: "GET",
-                mode: "cors",
-                cache: "no-cache",
-                headers:{
-                    "Authorization": `Bearer None`
-                },
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            }))
-                .pipe(
-                    map(data => {
-                            let networkCapabilities = [];
-                            for (let key in data) {
-                                if (isNaN(key)) {
-                                    let timestamp = Date.now();
-                                    // db.pipelines.put({ pipeline_name: key, values: data[key], timestamp })
-                                    networkCapabilities.push({pipeline_name: key, values: data[key], timestamp})
-                                }
-                            }
-                            return networkCapabilities;
-                        }
-                    ))
+        const fetchNewCaps = async () => {
+            try {
+                const capabilities = await db.capabilities.toArray();
+                return capabilities;
+            } catch (error) {
+                console.error('Error fetching capabilities from Dexie:', error);
+                return [];
+            }
+        }
+        if (!this.capabilities) {
+            console.log("fetching initial capabilities")
+            fetchNewCaps().then(capabilities => {
+                this.networkCapabilities = capabilities;
+                this.render();
+            });
         }
 
         let refreshButton = document.querySelector('#refresh-net-caps');
@@ -87,7 +82,7 @@ export default class NetworkCapabilities extends HTMLElement {
 
         let content = this.querySelector("#net-caps-content");
         content.textContent = ''
-        var html = this.viewTemplate({gateway: this.gateway, ...this.networkCapabilities});
+        var html = this.viewTemplate({ gateway: this.gateway, pipelines: this.networkCapabilities });
         content.innerHTML = html;
     }
 }

@@ -1,26 +1,9 @@
-// import Dexie from "dexie";
 
+const bearerToken = import.meta.env.VITE_GATEWAY_BEARER_TOKEN;
 
-// /*
-// |----------------------------|
-// | Declare your database      |
-// |----------------------------|
-// */
-// console.log("Creating Dexie DB ");
-
-// const db = new Dexie('LivepeerAI');
-
-// // Declare tables, IDs and indexes
-// db.version(1).stores({
-//     pipelines: '++id, pipeline_name, model, cold, warm'
-// });
-
-// console.log("Using Dexie v" + Dexie.semVer);
-
-// export const getDatabase = () => {
-//     return db;
-// }
-
+export const getBearerToken = ()=>{
+    return bearerToken ? bearerToken: "None"
+}
 
 export const getGatewayUrl = () => {
     const value = localStorage.getItem("gatewayUrl")

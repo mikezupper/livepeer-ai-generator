@@ -1,4 +1,4 @@
-import { getGatewayUrl, setGatewayUrl, num_between } from "../utils";
+import { getGatewayUrl, setGatewayUrl, num_between, getBearerToken } from "../utils";
 
 const generateImageFormTemplate = document.createElement("template");
 generateImageFormTemplate.innerHTML = `
@@ -273,7 +273,7 @@ export default class GenerateImgeForm extends HTMLElement {
         body: JSON.stringify(body),
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer None"
+          Authorization: `Bearer ${getBearerToken()}`
         }
       })
         .then((resp) => resp.json())

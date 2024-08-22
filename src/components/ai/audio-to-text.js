@@ -1,4 +1,4 @@
-import {getGatewayUrl} from "../../utils";
+import {getBearerToken, getGatewayUrl} from "../../utils";
 
 const audioToTextTemplate = document.createElement("template")
 audioToTextTemplate.innerHTML = `
@@ -154,7 +154,7 @@ export default class AudioToText extends HTMLElement {
             mode: "cors",
             cache: "no-cache",
             headers: {
-                "Authorization": `Bearer None`
+                "Authorization": `Bearer ${getBearerToken()}`
             },
             body
         })

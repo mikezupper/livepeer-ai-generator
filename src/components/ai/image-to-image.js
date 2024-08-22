@@ -1,4 +1,4 @@
-import { getGatewayUrl, num_between } from "../../utils";
+import { getBearerToken, getGatewayUrl, num_between } from "../../utils";
 
 const imageToImageTemplate = document.createElement("template")
 imageToImageTemplate.innerHTML = `
@@ -263,7 +263,7 @@ export default class ImageToImage extends HTMLElement {
             mode: "cors",
             cache: "no-cache",
             headers:{
-                "Authorization": `Bearer None`
+                "Authorization": `Bearer ${getBearerToken()}`
             },
             body
         })

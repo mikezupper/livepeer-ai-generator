@@ -1,4 +1,4 @@
-import { getGatewayUrl, num_between } from "../../utils";
+import { getBearerToken, getGatewayUrl, num_between } from "../../utils";
 
 const textToImageTemplate = document.createElement("template")
 textToImageTemplate.innerHTML = `
@@ -42,6 +42,8 @@ textToImageTemplate.innerHTML = `
                                 <option value="ByteDance/SDXL-Lightning-8step">ByteDance/SDXL-Lightning-8step</option>
                                 <option value="runwayml/stable-diffusion-v1-5">runwayml/stable-diffusion-v1-5</option>
                                 <option value="stabilityai/stable-diffusion-xl-base-1.0">stabilityai/stable-diffusion-xl-base-1.0</option>
+                                <optiom value="SG161222/Realistic_Vision_V6.0_B1_noVAE">SG161222/Realistic_Vision_V6.0_B1_noVAE</option>
+                                <option value="black-forest-labs/FLUX.1-schnell">black-forest-labs/FLUX.1-schnell</option>
                             </select>
                         </div>
                     </div>
@@ -268,7 +270,7 @@ export default class TextToImage extends HTMLElement {
             body: JSON.stringify(body),
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer None`
+                "Authorization": `Bearer ${getBearerToken()}`
             },
         })
             .then((resp) => resp.json())

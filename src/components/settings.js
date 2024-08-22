@@ -1,3 +1,4 @@
+import { db, fetchNewCaps } from "../db";
 import { getGatewayUrl, setGatewayUrl } from "../utils";
 import { NAV_LINKS_CLICKED_EVENT } from "./nav-links";
 const gatewayUrl =getGatewayUrl();
@@ -58,9 +59,27 @@ export default class Settings extends HTMLElement {
             const { type } = e.detail;
             this.success_notif.classList.add("is-hidden")
           })
-        this.form.onsubmit = (e) => {
+        this.form.onsubmit = async (e) => {
             e.preventDefault();
             this.saveSettings();
+                try {
+                    // Clear the capabilities table
+                    await db.capabilities.clear();
+                    console.log('Capabilities table cleared.');
+                    db.capabilitiesLastFetch.clear()
+                    console.log('CapabilitiesLastCheck table cleared.');
+
+        // Trigger a refresh by calling fetchNewCaps
+        const pipelines = await fetchNewCaps().toPromise();
+
+        if (pipelines) {
+            console.log('Capabilities refreshed and stored:', pipelines);
+        } else {
+            console.log('Skipped fetching new capabilities, using existing data.');
+        }
+                } catch (error) {
+                    console.error('Error clearing capabilities or refreshing data:', error);
+                }
         }
     }
     attributeChangedCallback(name, oldValue, newValue) {
