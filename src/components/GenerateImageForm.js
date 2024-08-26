@@ -1,4 +1,5 @@
 import { getGatewayUrl, setGatewayUrl, num_between, getBearerToken } from "../utils";
+import BaseComponent from "./BaseComponent.js";
 
 const generateImageFormTemplate = document.createElement("template");
 generateImageFormTemplate.innerHTML = `
@@ -133,7 +134,7 @@ generateImageFormTemplate.innerHTML = `
 </form>
 `
 
-export default class GenerateImgeForm extends HTMLElement {
+export default class GenerateImgeForm extends BaseComponent {
   // static observedAttributes = ["id", "image-src"];
 
   constructor() {

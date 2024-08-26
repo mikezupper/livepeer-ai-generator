@@ -1,15 +1,17 @@
+import BaseComponent from "./BaseComponent.js";
+
 const footerLinksTemplate = document.createElement("template");
 const currentDate = new Date();
 
 footerLinksTemplate.innerHTML = `
 <footer>
         <div class="content has-text-centered">
-          &copy; The Zoop Troop, Inc ${currentDate.getFullYear()}
+          &copy; Livepeer.Cloud SPE ${currentDate.getFullYear()}
         </div>
 </footer>
 `;
 
-export default class FooterLinks extends HTMLElement {
+export default class FooterLinks extends BaseComponent {
   constructor() {
     super();
 
