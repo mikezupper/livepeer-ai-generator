@@ -1,6 +1,6 @@
 import {html} from 'lit';
 import {getGatewayUrl} from '../../utils.js';
-import {PIPELINE_CHANGED_EVENT} from '../../service/GatewayDataFetcher.js';
+import {gatewayDataFetcher, PIPELINE_CHANGED_EVENT} from '../../service/GatewayDataFetcher.js';
 import BaseComponent from "../BaseComponent.js";
 
 export default class NetworkCapabilities extends BaseComponent {
@@ -31,11 +31,15 @@ export default class NetworkCapabilities extends BaseComponent {
         removeEventListener(PIPELINE_CHANGED_EVENT, this.updatePipelines);
     }
 
+    _handleNetworkCapabilitiesRefresh(){
+        gatewayDataFetcher.triggerFetchCapabilities()
+    }
+
     render() {
         //console.log('[NetworkCapabilities::render]',this.networkCapabilities);
         return html`
             <section data-nav-item="network-capabilities" class="is-hidden">
-                <h3>Network Capabilities</h3>
+                <h3>Network Capabilities - <a @click=${this._handleNetworkCapabilitiesRefresh}>Refresh</a></h3>
                 <div class="card">
                     <div class="card-content" id="net-caps-content">
                         <p class="title">Livepeer AI Pipelines Loaded</p>
