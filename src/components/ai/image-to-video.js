@@ -9,12 +9,12 @@ export default class ImageToVideo extends BaseComponent {
         this.models = [];
         this.gateway = getGatewayUrl()
         this.model_id = ''
-        this.fps = 6
+        this.fps = 4
         this.height = 576
         this.width = 1024
         this.motion_bucket_id = 127
-        this.noise_aug_strength = .002
-        this.safety_check = false
+        this.noise_aug_strength = 0.065
+        // this.safety_check = false
         this.seed = ''
         this.successMessage = ""
         this.errorMessage = ""
@@ -111,11 +111,11 @@ export default class ImageToVideo extends BaseComponent {
                                     <label class="label" for="fps">Frames per Second</label>
 
                                     <div class="control">
-                                        <input class="input" type="text" id="fps" name="fps" value="6" required=""
+                                        <input class="input" type="text" id="fps" name="fps" value="4" required=""
                                                @input=${this._handleInputChange}
                                                .value="${this.fps}"/>
                                     </div>
-                                    <p class="help">Default: 6</p>
+                                    <p class="help">Default: 4</p>
                                 </div>
 
                                 <div class="field">
@@ -140,7 +140,7 @@ export default class ImageToVideo extends BaseComponent {
                                     </div>
                                     <p class="help">Default: ???</p>
                                 </div>
-
+                                <!--
                                 <div class="field">
                                     <label class="label" for="model_id">Safety Check</label>
                                     <div class="control">
@@ -152,7 +152,7 @@ export default class ImageToVideo extends BaseComponent {
                                             </select>
                                         </div>
                                     </div>
-                                </div>
+                                </div>-->
                                 <div class="field">
                                     <label class="label" for="seed">Seed</label>
 
@@ -276,8 +276,8 @@ export default class ImageToVideo extends BaseComponent {
             body.append("motion_bucket_id", motion_bucket_id);
             body.append("height", height);
             body.append("width", width);
-            body.append("strength", strength);
-            body.append("safety_check", safety_check);
+            body.append("fps", fps);
+            // body.append("safety_check", safety_check);
 
             if (input_data.seed !== "") {
                 body.append("seed", input_data.seed);
