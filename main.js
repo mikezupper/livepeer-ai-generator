@@ -10,6 +10,7 @@ import AudioToText from './src/components/ai/audio-to-text.js';
 import Upscale from './src/components/ai/upscale.js';
 import NetworkCapabilities from './src/components/ai/network-capabilities.js';
 import AudioTextCard from "./src/components/AudioTextCard.js";
+import SegmentAnything2 from "./src/components/ai/segment-anything-2.js";
 
 // register all custom elements
 customElements.define("generated-image-card", GeneratedImageCard);
@@ -24,6 +25,7 @@ customElements.define("ai-image-to-image", ImageToImage);
 customElements.define("ai-image-to-video", ImageToVideo);
 customElements.define("ai-audio-to-text", AudioToText);
 customElements.define("ai-upscale", Upscale);
+customElements.define("ai-segment-anything-2", SegmentAnything2);
 
 //NavLinks must be the last element loaded, it requires all other elements to be rendered prior to itself.
 // This is because NavLinks is going to find all "sections" and make sure it detects when they are clicked and displayed.

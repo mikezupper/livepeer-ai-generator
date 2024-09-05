@@ -96,6 +96,9 @@ export default class NavLinks extends BaseComponent {
                         <a class="navbar-item" id="nav-links-3" data-type="upscale">
                             Upscale an Image
                         </a>
+                        <a class="navbar-item" id="nav-links-3" data-type="segment-anything-2">
+                            Segment Anything 2
+                        </a>
                         <a class="navbar-item" id="nav-links-4" data-type="network-capabilities">
                             Network Capabilities
                         </a>
