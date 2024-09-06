@@ -1,187 +1,223 @@
-import { getBearerToken, getGatewayUrl, num_between } from "../../utils";
+import {getBearerToken, getGatewayUrl, num_between} from "../../utils";
+import BaseComponent from "../BaseComponent.js";
+import {html} from "lit";
+import {PIPELINE_CHANGED_EVENT} from "../../service/GatewayDataFetcher.js";
 
-const textToImageTemplate = document.createElement("template")
-textToImageTemplate.innerHTML = `
-<section data-nav-item="text-to-image" class="is-hidden">
-
-<div class="columns">
-    <div class="card column m-2">
-        <div class="card-content">
-            <div class="content">
-                Fill out your input and click generate
-            </div>
-            <div class="notification is-info is-hidden" id="text-to-image-success"></div>
-
-            <form id="text-to-image-form">
-                <div class="notification is-danger is-hidden" id="text-to-image-errors"></div>
-                <div class="field">
-                    <label for="prompt" class="label">Prompt</label>
-                    <div class="control">
-                        <textarea class="textarea" id="prompt" name="prompt"
-                            placeholder="Type in your prompt"></textarea>
-                    </div>
-                </div>
-
-                <div class="field is-grouped">
-                    <div class="control">
-                        <button class="button is-primary" id="submit-prompt">Generate</button>
-                    </div>
-                    <progress id="text-to-image-progress" class="progress is-hidden" value="0" max="8">0%</progress>
-                </div>
-                <div class="field">
-                    <label class="label" for="model_id">Model</label>
-                    <div class="control">
-                        <div class="select">
-                            <select id="model_id" name="model_id">
-                                <option value="stabilityai/stable-diffusion-3-medium-diffusers">stabilityai/stable-diffusion-3-medium-diffusers</option>
-                                <option value="SG161222/RealVisXL_V4.0">SG161222/RealVisXL_V4.0</option>
-                                <option selected value="SG161222/RealVisXL_V4.0_Lightning">SG161222/RealVisXL_V4.0_Lightning</option>
-                                <option value="ByteDance/SDXL-Lightning">ByteDance/SDXL-Lightning</option>
-                                <option value="ByteDance/SDXL-Lightning-4step">ByteDance/SDXL-Lightning-4step</option>
-                                <option value="ByteDance/SDXL-Lightning-6step">ByteDance/SDXL-Lightning-6step</option>
-                                <option value="ByteDance/SDXL-Lightning-8step">ByteDance/SDXL-Lightning-8step</option>
-                                <option value="runwayml/stable-diffusion-v1-5">runwayml/stable-diffusion-v1-5</option>
-                                <option value="stabilityai/stable-diffusion-xl-base-1.0">stabilityai/stable-diffusion-xl-base-1.0</option>
-                                <optiom value="SG161222/Realistic_Vision_V6.0_B1_noVAE">SG161222/Realistic_Vision_V6.0_B1_noVAE</option>
-                                <option value="black-forest-labs/FLUX.1-schnell">black-forest-labs/FLUX.1-schnell</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="negative_prompt" class="label">Negative Prompt</label>
-                    <div class="control">
-                        <input class="input" type="text" id="negative_prompt" name="negative_prompt"
-                            placeholder="worst quality, low quality" />
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label" for="width">Width</label>
-
-                    <div class="control">
-                        <input class="input" type="text" id="width" name="width" value="1024" />
-                    </div>
-                    <p class="help">Default: 1024</p>
-                </div>
-                <div class="field">
-                    <label class="label" for="height">Height</label>
-
-                    <div class="control">
-                        <input class="input" type="text" id="height" name="height" value="576" />
-                    </div>
-                    <p class="help">Default: 576</p>
-                </div>
-
-                <div class="field">
-                    <label class="label" for="num_images_per_prompt"># of Images</label>
-
-                    <div class="control">
-                        <input class="input" type="text" id="num_images_per_prompt"
-                            name="num_images_per_prompt" value="2" />
-                    </div>
-                    <p class="help">Max of 10</p>
-                </div>
-
-                <div class="field">
-                    <label class="label" for="num_inference_steps"># of Inference Steps</label>
-
-                    <div class="control">
-                        <input class="input" type="text" id="num_inference_steps" name="num_inference_steps"
-                            value="6" />
-                    </div>
-                    <p class="help">Optional</p>
-                </div>
-
-                <div class="field">
-                    <label class="label" for="guidance_scale">Guidance Scale</label>
-
-                    <div class="control">
-                        <input class="input" type="text" id="guidance_scale" name="guidance_scale"
-                            value="2" />
-                    </div>
-                    <p class="help">Optional</p>
-                </div>
-                <div class="field">
-                    <label class="label" for="model_id">Safety Check</label>
-                    <div class="control">
-                        <div class="select">
-                            <select id="safety_check" name="safety_check">
-                                <option selected value="true">true</option>
-                                <option value="false">false</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label" for="seed">Seed</label>
-
-                    <div class="control">
-                        <input class="input" type="text" id="seed" name="seed" value="" />
-                    </div>
-                    <p class="help">Optional</p>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="card column m-2">
-        <div class="card-content">
-            <div class="content">
-                Your image output will be displayed here.
-            </div>
-            <div id="text-to-image-output"></div>
-        </div>
-    </div>
-    <div class="card column m-2">
-        <div class="card-content">
-            <div class="content">
-                Your Video output will be displayed here.
-            </div>
-            <div class="notification is-danger is-hidden" id="text-to-image-video-errors"></div>
-            <div id="text-to-image-vid-output"></div>
-        </div>
-    </div>
-</div>
-</section>
-`
-export default class TextToImage extends HTMLElement {
+export default class TextToImage extends BaseComponent {
     constructor() {
         super();
+        this.models = [];
+        this.gateway = getGatewayUrl()
+        this.model_id = ''
+        this.prompt = ''
+        this.negative_prompt = ''
+        this.guidance_scale = 2
+        this.num_images_per_prompt = 2
+        this.num_inference_steps = 6
+        this.height = 576
+        this.width = 1024
+        this.safety_check = false
+        this.seed = ''
+        this.successMessage = ""
+        this.errorMessage = ""
+        this.updateModels = this.updateModels.bind(this);
     }
+
+    static properties = {
+        models: {type: Array},
+        gateway: {type: String},
+        errorMessage: {type: String},
+        successMessage: {type: String}
+    };
 
     connectedCallback() {
-        this.template = textToImageTemplate.content.cloneNode(true); // true means deep clone
-        this.appendChild(this.template);
-        this.form = this.querySelector("form");
-        this.form.onsubmit = (e) => {
-            e.preventDefault();
-            this.generateImage();
-        }
-        this.success_notif = document.getElementById("text-to-image-success")
-        this.error_notif = document.getElementById("text-to-image-errors")
-        this.generateImageButton = this.form.querySelector("button")
+        super.connectedCallback()
+        addEventListener(PIPELINE_CHANGED_EVENT, this.updateModels);
     }
 
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        removeEventListener(PIPELINE_CHANGED_EVENT, this.updateModels);
+    }
 
+    render() {
+        return html`
+            <section data-nav-item="text-to-image" class="is-hidden">
+                <div class="columns">
+                    <div class="card column m-2">
+                        <div class="card-content">
+                            <div class="content">
+                                Fill out your input and click generate
+                            </div>
+                            ${this.successMessage ? html`
+                                <div class="notification is-info">${this.successMessage}</div>` : ''}
 
-    generateImage() {
-        this.error_notif.classList.add("is-hidden");
-        this.success_notif.classList.add("is-hidden");
+                            <form @submit=${this._handleSubmit}>
+                                ${this.errorMessage ? html`
+                                    <div class="notification is-danger">
+                                        ${this.errorMessage}
+                                    </div>` : ''}
+                                <div class="field">
+                                    <label for="prompt" class="label">Prompt</label>
+                                    <div class="control">
+                                        <textarea class="textarea" id="prompt" name="prompt"
+                                                  placeholder="Type in your prompt" required=""
+                                                  @input=${this._handleInputChange} .value="${this.prompt}"></textarea>
+                                    </div>
+                                </div>
 
-        let formData = new FormData(this.form);
+                                <div class="field is-grouped">
+                                    <div class="control">
+                                        <button class="button is-primary" id="submit-prompt">Generate</button>
+                                    </div>
+                                    <progress id="text-to-image-progress" class="progress is-hidden" value="0" max="8">
+                                        0%
+                                    </progress>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="model_id">Model</label>
+                                    <div class="control">
+                                        <div class="select">
+                                            <select id="model_id" name="model_id" @input=${this._handleInputChange}
+                                                    .value="${this.model_id}">
+                                                ${this.models.map(model => html`
+                                                    <option value="${model.name}">${model.name}</option>
+                                                `)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label for="negative_prompt" class="label">Negative Prompt</label>
+                                    <div class="control">
+                                        <input class="input" type="text" id="negative_prompt" name="negative_prompt"
+                                               placeholder="worst quality, low quality"
+                                               @input=${this._handleInputChange} .value="${this.negative_prompt}"/>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="width">Width</label>
+
+                                    <div class="control">
+                                        <input class="input" type="text" id="width" name="width" value="1024"
+                                               required="" @input=${this._handleInputChange} .value="${this.width}"/>
+                                    </div>
+                                    <p class="help">Default: 1024</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="height">Height</label>
+
+                                    <div class="control">
+                                        <input class="input" type="text" id="height" name="height" value="576"
+                                               required="" @input=${this._handleInputChange} .value="${this.height}"/>
+                                    </div>
+                                    <p class="help">Default: 576</p>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label" for="num_images_per_prompt"># of Images</label>
+
+                                    <div class="control">
+                                        <input class="input" type="text" id="num_images_per_prompt"
+                                               name="num_images_per_prompt" value="2" required=""
+                                               @input=${this._handleInputChange}
+                                               .value="${this.num_images_per_prompt}"/>
+                                    </div>
+                                    <p class="help">Max of 10</p>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label" for="num_inference_steps"># of Inference Steps</label>
+
+                                    <div class="control">
+                                        <input class="input" type="text" id="num_inference_steps"
+                                               name="num_inference_steps"
+                                               value="6" required="" @input=${this._handleInputChange}
+                                               .value="${this.num_inference_steps}"/>
+                                    </div>
+                                    <p class="help">Optional</p>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label" for="guidance_scale">Guidance Scale</label>
+
+                                    <div class="control">
+                                        <input class="input" type="text" id="guidance_scale" name="guidance_scale"
+                                               value="2" required="" @input=${this._handleInputChange}
+                                               .value="${this.guidance_scale}"/>
+                                    </div>
+                                    <p class="help">Optional</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="model_id">Safety Check</label>
+                                    <div class="control">
+                                        <div class="select">
+                                            <select id="safety_check" name="safety_check"
+                                                    @input=${this._handleInputChange} .value="${this.safety_check}">
+                                                <option value="false">false</option>
+                                                <option value="true">true</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="seed">Seed</label>
+                                    <div class="control">
+                                        <input class="input" type="text" id="seed" name="seed" value=""
+                                               @input=${this._handleInputChange} .value="${this.seed}"/>
+                                    </div>
+                                    <p class="help">Optional</p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card column m-2">
+                        <div class="card-content">
+                            <div class="content">
+                                Your image output will be displayed here.
+                            </div>
+                            <div id="text-to-image-output"></div>
+                        </div>
+                    </div>
+                    <div class="card column m-2">
+                        <div class="card-content">
+                            <div class="content">
+                                Your Video output will be displayed here.
+                            </div>
+                            <div class="notification is-danger is-hidden" id="text-to-image-video-errors"></div>
+                            <div id="text-to-image-vid-output"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
+    }
+
+    // Handle input changes
+    _handleInputChange(e) {
+        const {name, value} = e.target;
+        this[name] = value;
+    }
+
+    // Handle form submission
+    async _handleSubmit(e) {
+        e.preventDefault();
+        console.log("[TextToImage] _handleSubmit ", e)
+        let formData = new FormData(e.target);
         const input_data = Object.fromEntries(formData.entries());
+        console.log("[TextToImage::_handleSubmit] input_data", input_data);
 
-
-        let errors = new Array();
+        let errors = []
 
         let height = parseInt(input_data.height)
 
-        if (isNaN(height) || num_between(height, 1, 1024) == false) {
+        if (isNaN(height) || num_between(height, 1, 1024) === false) {
             errors.push("height is must be a number between 1 and 1024")
         }
 
         let width = parseInt(input_data.width)
 
-        if (isNaN(width) || num_between(width, 1, 1024) == false) {
+        if (isNaN(width) || num_between(width, 1, 1024) === false) {
             errors.push("width is must be a number between 1 and 1024")
         }
 
@@ -203,86 +239,103 @@ export default class TextToImage extends HTMLElement {
             errors.push("Max of 10 Images")
         }
 
-        let safety_check = input_data.safety_check == 'true';
-
+        let safety_check = input_data.safety_check === 'true';
 
         if (!input_data.prompt) {
             errors.push("Please enter a prompt")
         }
 
         if (errors.length > 0) {
-            let errorMsg = errors.map(e => { return (e + "\n") })
-            this.error_notif.textContent = "errors occurred: \n" + errorMsg;
-            this.error_notif.classList.remove("is-hidden");
-            return
-        }
-        let body = {
-            ...input_data
-            , safety_check
-            , guidance_scale
-            , num_inference_steps
-            , num_images_per_prompt
-            , height
-            , width
-        };
+            let errorMsg = errors.map(e => {
+                return (e + "\n")
+            })
+            this.errorMessage = "errors occurred: \n" + errorMsg;
+        } else {
+            let body = {
+                ...input_data
+                , safety_check
+                , guidance_scale
+                , num_inference_steps
+                , num_images_per_prompt
+                , height
+                , width
+            };
 
-        delete body.seed
+            delete body.seed
 
-        if (input_data.seed != "") {
-            body = { ...body, seed: parseInt(input_data.seed) }
-        }
-
-        this.generateImageButton.classList.add("is-loading");
-        const outputElement = document.getElementById("text-to-image-output");
-        const handleImageGeneration = async (data) => {
-
-            this.generateImageButton.classList.remove("is-loading");
-            outputElement.textContent = "";
-
-            if (data.error) {
-                this.error_notif.classList.remove("is-hidden");
-                this.error_notif.textContent = "failed generating an image, please try again";
-                return;
+            if (input_data.seed !== "") {
+                body = {...body, seed: parseInt(input_data.seed)}
             }
 
-            const { images } = data;
-            images.forEach(async (img, index) => {
-                // console.log("text to image img_url",img.url)
-                let img_url = img.url;
-                if(img_url.startsWith("http") == false)
-                    img_url=`${getGatewayUrl()}${img.url}`;
-                // console.log("text to image fetaching image from ",img_url)
+            this.generateImageButton = e.target.querySelector("button")
+            this.generateImageButton.classList.add("is-loading");
+            const outputElement = document.getElementById("text-to-image-output");
+            const handleImageGeneration = async (data) => {
 
-                const imageCardElement = document.createElement("generated-image-card");
-                imageCardElement.setAttribute("index", `${index}`);
-                imageCardElement.setAttribute("image-src", `${img_url}`);
-                imageCardElement.setAttribute("video-output", `text-to-image-vid-output`);
+                this.generateImageButton.classList.remove("is-loading");
+                outputElement.textContent = "";
 
-                outputElement.append(imageCardElement);
+                if (data.error) {
+                    this.errorMessage = "failed generating an image, please try again";
+                    return;
+                }
 
-            });
+                const {images} = data;
+                for (const img of images) {
+                    const index = images.indexOf(img);
+                    // console.log("text to image img_url",img.url)
+                    let img_url = img.url;
+                    if (img_url.startsWith("http") === false)
+                        img_url = `${getGatewayUrl()}${img.url}`;
+                    // console.log("text to image fetching image from ",img_url)
+
+                    const imageCardElement = document.createElement("generated-image-card");
+                    imageCardElement.setAttribute("index", `${index}`);
+                    imageCardElement.setAttribute("image-src", `${img_url}`);
+                    imageCardElement.setAttribute("video-output", `text-to-image-vid-output`);
+
+                    outputElement.append(imageCardElement);
+
+                }
+            }
+
+            fetch(`${getGatewayUrl()}/text-to-image`, {
+                method: "POST",
+                mode: "cors",
+                cache: "no-cache",
+                body: JSON.stringify(body),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${getBearerToken()}`
+                },
+            })
+                .then((resp) => resp.json())
+                .then(async (data) => {
+                    await handleImageGeneration(data);
+                })
+                .catch((err) => {
+                    console.error("[GenerateImgeForm::submitPrompt]", err)
+                    this.errorMessage = "Failed to generate image, please try again.";
+                })
         }
 
-        fetch(`${getGatewayUrl()}/text-to-image`, {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            body: JSON.stringify(body),
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${getBearerToken()}`
-            },
-        })
-            .then((resp) => resp.json())
-            .then(async (data) => {
-                await handleImageGeneration(data);
-            })
-            .catch((err) => {
-                console.error("[GenerateImgeForm::submitPrompt]", err)
-                this.error_notif.textContent = "Failed to generate image, please try again.";
-                this.generateImageButton.classList.remove("is-loading");
-                this.error_notif.classList.remove("is-hidden");
-            });
+        //reset and remaining error messages
+        setTimeout(() => {
+            this.successMessage = '';
+            this.errorMessage = '';
+        }, 3000);
+    }
+
+    updateModels(e) {
+        const pipelines = e.detail;
+        const filteredPipelines = pipelines
+            .filter(pipeline => pipeline.name.startsWith("Text to image"))
+            .map(pipeline => pipeline.models.sort((a, b) => b.Warm - a.Warm))
+
+        if (filteredPipelines.length > 0) {
+            [this.models] = filteredPipelines;
+        } else {
+            this.models = []; // Handle the case where no models were found
+        }
     }
 }
-
