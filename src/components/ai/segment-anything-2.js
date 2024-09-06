@@ -11,7 +11,7 @@ export default class SegmentAnything2 extends BaseComponent {
         this.model_id = ''
         this.point_coords = ''
         this.point_labels = ''
-        this.usePoint = true
+        this.usePoint = false
         this.box = ''
         this.mask_input = ''
         this.normalize_coords = true
@@ -69,6 +69,14 @@ export default class SegmentAnything2 extends BaseComponent {
                         <div class="card-content">
                             <div class="content">
                                 Upload your image and click Segment Anything 2
+                            </div>
+                            <div class="notification">
+                                <p>To segment an image:</p><br>
+                                <p>1. First upload your image.</p>
+                                <p>2. Draw a "box" around the section of the uploaded image you would like to segment.</p>
+                                <p>3. If you don't want to draw a box, click "Use Point" checkbox. This change drawing a box to selecting a dot anywhere on the image to segment.</p>
+                                <p>4. Once, you have selected a section of the image (either a box or point), then click the "Segment Anything 2" button.</p>
+                                <p>5. Your original image will be displayed with the selected region highlighted.</p>
                             </div>
                             <form enctype="multipart/form-data" @submit=${this._handleSubmit}>
                                 ${this.errorMessage ? html`
