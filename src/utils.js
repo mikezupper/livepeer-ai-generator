@@ -1,5 +1,5 @@
 const bearerToken = import.meta.env.VITE_GATEWAY_BEARER_TOKEN;
-const defaultGatewayUrl = import.meta.env.VITE_GATEWAY_URL;
+export const defaultGatewayUrl = import.meta.env.VITE_GATEWAY_URL;
 const defaultNavLink = import.meta.env.VITE_NAVIGATION_LINK;
 
 export const getBearerToken = ()=>{
