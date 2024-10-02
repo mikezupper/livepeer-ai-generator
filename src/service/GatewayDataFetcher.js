@@ -82,54 +82,66 @@ class GatewayDataFetcher {
     async fetchAndStoreCapabilities() {
         try {
             let gw = getGatewayUrl();
-            let url = `${gw}/getNetworkCapabilities`;
+            let url = `${gw}/getOrchestratorAICapabilities`;
             let response = await fetch(url, {
                 method: "GET",
                 mode: "cors",
             });
 
             if (!response.ok) {
-                throw new Error('[GatewayDataFetcher] Network Capabilities response was not ok');
+                throw new Error('[GatewayDataFetcher] fetching Orchestrator AI Capabilities response was not ok');
             }
             let data = await response.json();
 
             const pipelines = {};
-            const supportedPipelines = data.supported_pipelines;
-            const orchestrators = data.orchestrators;
 
-            for (let pipelineName in supportedPipelines) {
-                let pipelineModels = [];
+            for (let orchestrator of data.orchestrators) {
+                const ethAddress = orchestrator.address;
 
-                for (let modelName in supportedPipelines[pipelineName]) {
-                    let modelData = supportedPipelines[pipelineName][modelName];
-                    let orchestratorList = [];
+                // Get the orchestrator's name from the database if available
+                const storedOrchestrator = await this.db.orchestrators.get(ethAddress);
+                const storedOrchestratorName = storedOrchestrator?.name || ethAddress
 
-                    for (let orchestrator in orchestrators) {
-                        let pipelineOrchestrator = orchestrators[orchestrator]["Pipelines"][pipelineName];
+                for (let pipeline of orchestrator.pipelines) {
+                    const pipelineType = pipeline.type;
 
-                        if (pipelineOrchestrator && pipelineOrchestrator[modelName]) {
-                            const storedOrchestrator = await this.db.orchestrators.get(orchestrator);
-                            orchestratorList.push({
-                                ethAddress: storedOrchestrator?.name || orchestrator,
-                                warm: pipelineOrchestrator[modelName].Warm
-                            });
-                        }
+                    if (!pipelines[pipelineType]) {
+                        pipelines[pipelineType] = {
+                            name: pipelineType,
+                            models: []
+                        };
                     }
 
-                    pipelineModels.push({
-                        name: modelName,
-                        Cold: modelData.Cold,
-                        Warm: modelData.Warm,
-                        orchestrators: orchestratorList
-                    });
-                }
+                    for (let model of pipeline.models) {
+                        const modelName = model.name;
+                        const modelStatus = model.status;
 
-                pipelines[pipelineName] = {
-                    name: pipelineName,
-                    models: pipelineModels
-                };
+                        let pipelineModels = pipelines[pipelineType].models;
+
+                        let modelEntry = pipelineModels.find(m => m.name === modelName);
+
+                        if (!modelEntry) {
+                            modelEntry = {
+                                name: modelName,
+                                Cold: 0,
+                                Warm: 0,
+                                orchestrators: []
+                            };
+                            pipelineModels.push(modelEntry);
+                        }
+
+                        modelEntry.Cold += modelStatus.Cold;
+                        modelEntry.Warm += modelStatus.Warm;
+
+                        modelEntry.orchestrators.push({
+                            ethAddress: storedOrchestratorName,
+                            warm: modelStatus.Warm
+                        });
+                    }
+                }
             }
 
+            // Now, clear the capabilities database and store the new data
             await this.db.capabilities.clear();
 
             for (let pipelineName in pipelines) {
@@ -138,6 +150,7 @@ class GatewayDataFetcher {
                     models: pipelines[pipelineName].models
                 });
             }
+
         } catch (error) {
             console.error('[GatewayDataFetcher] Error fetching or storing capabilities:', error);
         }

@@ -387,7 +387,7 @@ export default class SegmentAnything2 extends BaseComponent {
     updateModels(e) {
         const pipelines = e.detail;
         const filteredPipelines = pipelines
-            .filter(pipeline => pipeline.name.startsWith("Segment Anything 2"))
+            .filter(pipeline => pipeline.name.startsWith("Segment anything 2"))
             .map(pipeline => pipeline.models.sort((a, b) => b.Warm - a.Warm))
 
         if (filteredPipelines.length > 0) {
