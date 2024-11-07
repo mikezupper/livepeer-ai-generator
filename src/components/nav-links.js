@@ -82,16 +82,17 @@ export default class NavLinks extends BaseComponent {
                         <a class="navbar-item" id="nav-links-0" data-type="text-to-image">
                             Text to Image
                         </a>
-
                         <a class="navbar-item" id="nav-links-1" data-type="image-to-image">
                             Image to Image
                         </a>
-
                         <a class="navbar-item" id="nav-links-2" data-type="image-to-video">
                             Image to Video
                         </a>
                         <a class="navbar-item" id="nav-links-2" data-type="audio-to-text">
                             Audio to Text
+                        </a>
+                        <a class="navbar-item" id="nav-links-3" data-type="text-to-speech">
+                            Text to Speech
                         </a>
                         <a class="navbar-item" id="nav-links-3" data-type="upscale">
                             Upscale an Image
