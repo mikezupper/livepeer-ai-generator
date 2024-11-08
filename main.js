@@ -14,12 +14,15 @@ import SegmentAnything2 from "./src/components/ai/segment-anything-2.js";
 import LLM from "./src/components/ai/llm.js";
 import TextToSpeech from "./src/components/ai/text-to-speech.js";
 import TextToSpeechOutputCard from "./src/components/TextToSpeechOutputCard.js";
+import ImageToText from "./src/components/ai/image-to-text.js";
+import ImageTextOutputCard from "./src/components/ImageToTextOutputCard.js";
 
 // register all custom elements
 customElements.define("generated-image-card", GeneratedImageCard);
 customElements.define("generate-image-form", GenerateImgeForm);
 customElements.define("audio-text", AudioTextCard);
 customElements.define("speech-card", TextToSpeechOutputCard);
+customElements.define("generated-text-card", ImageTextOutputCard);
 
 customElements.define("footer-links", FooterLinks);
 
@@ -27,6 +30,7 @@ customElements.define("ai-settings", Settings);
 customElements.define("ai-network-capabilities", NetworkCapabilities);
 customElements.define("ai-text-to-image", TextToImage);
 customElements.define("ai-image-to-image", ImageToImage);
+customElements.define("ai-image-to-text", ImageToText);
 customElements.define("ai-image-to-video", ImageToVideo);
 customElements.define("ai-audio-to-text", AudioToText);
 customElements.define("ai-text-to-speech", TextToSpeech);

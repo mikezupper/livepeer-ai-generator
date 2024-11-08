@@ -41,7 +41,7 @@ export default class NavLinks extends BaseComponent {
             });
         this.defaultNavLinkSelection();
 
-        const $navbarBurgers = Array.prototype.slice.call(this.querySelectorAll('.navbar-burger'), 0);
+        const $navbarBurgers = Array.prototype.slice.call(this.querySelectorAll('.navbar-burger[data-type]'), 0);
         // Add a click event on each of them
         $navbarBurgers.forEach(el => {
             el.addEventListener('click', () => {
@@ -57,7 +57,7 @@ export default class NavLinks extends BaseComponent {
             });
         });
 
-        const links = this.querySelectorAll(".navbar-item");
+        const links = this.querySelectorAll(".navbar-item[data-type]");
         links.forEach((link) => {
             link.addEventListener('click', (e) => {
                 const {type} = e.target?.dataset;
@@ -77,38 +77,29 @@ export default class NavLinks extends BaseComponent {
                     <span aria-hidden="true"></span>
                 </a>
 
-                <div id="mainNavBar" class="navbar-menu ">
+                <div id="mainNavBar" class="navbar-menu">
                     <div class="navbar-start">
-                        <a class="navbar-item" id="nav-links-0" data-type="text-to-image">
-                            Text to Image
-                        </a>
-                        <a class="navbar-item" id="nav-links-1" data-type="image-to-image">
-                            Image to Image
-                        </a>
-                        <a class="navbar-item" id="nav-links-2" data-type="image-to-video">
-                            Image to Video
-                        </a>
-                        <a class="navbar-item" id="nav-links-2" data-type="audio-to-text">
-                            Audio to Text
-                        </a>
-                        <a class="navbar-item" id="nav-links-3" data-type="text-to-speech">
-                            Text to Speech
-                        </a>
-                        <a class="navbar-item" id="nav-links-3" data-type="upscale">
-                            Upscale an Image
-                        </a>
-                        <a class="navbar-item" id="nav-links-3" data-type="segment-anything-2">
-                            Segment Anything 2
-                        </a>
-                        <a class="navbar-item" id="nav-links-3" data-type="llm">
-                            LLM
-                        </a>
-                        <a class="navbar-item" id="nav-links-4" data-type="network-capabilities">
-                            Network Capabilities
-                        </a>
-                        <a class="navbar-item" id="nav-links-4" data-type="settings">
-                            Settings
-                        </a>
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#" @click="${e => e.preventDefault()}">Image Tasks</a>
+                            <div class="navbar-dropdown">
+                                <a class="navbar-item" data-type="text-to-image">Text to Image</a>
+                                <a class="navbar-item" data-type="image-to-image">Image to Image</a>
+                                <a class="navbar-item" data-type="image-to-video">Image to Video</a>
+                                <a class="navbar-item" data-type="image-to-text">Image to Text</a>
+                                <a class="navbar-item" data-type="upscale">Upscale</a>
+                            </div>
+                        </div>
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#" @click="${e => e.preventDefault()}">Audio Tasks</a>
+                            <div class="navbar-dropdown">
+                                <a class="navbar-item" data-type="audio-to-text">Audio to Text</a>
+                                <a class="navbar-item" data-type="text-to-speech">Text to Speech</a>
+                            </div>
+                        </div>
+                        <a class="navbar-item" data-type="segment-anything-2">Segment Anything 2</a>
+                        <a class="navbar-item" data-type="llm">LLM</a>
+                        <a class="navbar-item" data-type="network-capabilities">Network Capabilities</a>
+                        <a class="navbar-item" data-type="settings">Settings</a>
                     </div>
                 </div>
             </nav>`
