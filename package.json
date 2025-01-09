@@ -6,12 +6,6 @@
     "vite": "^4.3.6"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.2.7",
-    "dexie": "^4.0.8",
-    "handlebars": "^4.7.8",
-    "lit": "^3.2.0",
-    "marked": "^14.1.2",
-    "rxjs": "^7.8.1"
   },
   "type": "module",
   "main": "main.js",
